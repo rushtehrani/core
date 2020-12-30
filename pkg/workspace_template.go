@@ -353,10 +353,6 @@ func createStatefulSetManifest(spec *WorkspaceSpec) (statefulSetManifest string,
 			continue
 		}
 
-		// Use the `onepanel` storage class instead of default
-		if v.Spec.StorageClassName == nil {
-			v.Spec.StorageClassName = ptr.String("onepanel")
-		}
 		// Check if storage is set or if it needs to be dynamic
 		var storage interface{} = fmt.Sprintf("{{workflow.parameters.sys-%v-volume-size}}Mi", v.Name)
 		if v.Spec.Resources.Requests != nil {
@@ -367,8 +363,7 @@ func createStatefulSetManifest(spec *WorkspaceSpec) (statefulSetManifest string,
 				Name: v.ObjectMeta.Name,
 			},
 			"spec": map[string]interface{}{
-				"accessModes":      v.Spec.AccessModes,
-				"storageClassName": v.Spec.StorageClassName,
+				"accessModes": v.Spec.AccessModes,
 				"resources": map[string]interface{}{
 					"requests": map[string]interface{}{
 						"storage": storage,
@@ -401,7 +396,6 @@ func createStatefulSetManifest(spec *WorkspaceSpec) (statefulSetManifest string,
 					"accessModes": []corev1.PersistentVolumeAccessMode{
 						"ReadWriteOnce",
 					},
-					"storageClassName": ptr.String("onepanel"),
 					"resources": map[string]interface{}{
 						"requests": map[string]string{
 							"storage": fmt.Sprintf("{{workflow.parameters.sys-%v-volume-size}}Mi", v.Name),
